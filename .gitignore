@@ -1,0 +1,9 @@
+# Vivado HLS 生成的中间产物（可重新生成，不入库）
+.autopilot/
+.tcls/
+csim/
+sim/
+syn/
+impl/
+.apc/
+.reference/

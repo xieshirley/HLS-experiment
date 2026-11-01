@@ -1,0 +1,597 @@
+==============================================================
+File generated on Fri Oct 30 23:56:48 +0800 2026
+Vivado(TM) HLS - High-Level Synthesis from C, C++ and SystemC v2018.3 (64-bit)
+SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+==============================================================
+INFO: [SYN 201-201] Setting up clock 'default' with a period of 10ns.
+INFO: [SYN 201-201] Setting up clock 'default' with an uncertainty of 0.1ns.
+INFO: [HLS 200-10] Setting target device to 'xc7a100tcsg324-1'
+INFO: [SIM 211-2] *************** CSIM start ***************
+INFO: [SIM 211-4] CSIM will launch GCC as the compiler.
+INFO: [SIM 211-1] CSim done with 0 errors.
+INFO: [SIM 211-3] *************** CSIM finish ***************
+==============================================================
+File generated on Fri Oct 30 23:59:12 +0800 2026
+Vivado(TM) HLS - High-Level Synthesis from C, C++ and SystemC v2018.3 (64-bit)
+SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+==============================================================
+INFO: [SYN 201-201] Setting up clock 'default' with a period of 10ns.
+INFO: [SYN 201-201] Setting up clock 'default' with an uncertainty of 0.1ns.
+INFO: [HLS 200-10] Setting target device to 'xc7a100tcsg324-1'
+INFO: [SCHED 204-61] Option 'relax_ii_for_timing' is enabled, will increase II to preserve clock frequency constraints.
+INFO: [HLS 200-10] Analyzing design file 'matmul.cpp' ... 
+INFO: [HLS 200-111] Finished Linking Time (s): cpu = 00:00:00 ; elapsed = 00:00:10 . Memory (MB): peak = 103.137 ; gain = 20.605
+INFO: [HLS 200-111] Finished Checking Pragmas Time (s): cpu = 00:00:00 ; elapsed = 00:00:10 . Memory (MB): peak = 103.137 ; gain = 20.605
+INFO: [HLS 200-10] Starting code transformations ...
+INFO: [HLS 200-111] Finished Standard Transforms Time (s): cpu = 00:00:00 ; elapsed = 00:00:10 . Memory (MB): peak = 104.613 ; gain = 22.082
+INFO: [HLS 200-10] Checking synthesizability ...
+INFO: [HLS 200-111] Finished Checking Synthesizability Time (s): cpu = 00:00:00 ; elapsed = 00:00:10 . Memory (MB): peak = 104.867 ; gain = 22.336
+INFO: [XFORM 203-502] Unrolling all sub-loops inside loop 'I' (matmul.cpp:14) in function 'matmul_top' for pipelining.
+INFO: [HLS 200-489] Unrolling loop 'J' (matmul.cpp:16) in function 'matmul_top' completely with a factor of 8.
+INFO: [HLS 200-489] Unrolling loop 'K' (matmul.cpp:19) in function 'matmul_top' completely with a factor of 8.
+INFO: [XFORM 203-11] Balancing expressions in function 'matmul_top' (matmul.cpp:10)...56 expression(s) balanced.
+INFO: [HLS 200-111] Finished Pre-synthesis Time (s): cpu = 00:00:00 ; elapsed = 00:00:10 . Memory (MB): peak = 126.195 ; gain = 43.664
+INFO: [HLS 200-111] Finished Architecture Synthesis Time (s): cpu = 00:00:00 ; elapsed = 00:00:10 . Memory (MB): peak = 126.195 ; gain = 43.664
+INFO: [HLS 200-10] Starting hardware synthesis ...
+INFO: [HLS 200-10] Synthesizing 'matmul_top' ...
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'matmul_top' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-61] Pipelining loop 'I'.
+WARNING: [SCHED 204-69] Unable to schedule 'load' operation ('A_load_2', matmul.cpp:21) on array 'A' due to limited memory ports. Please consider using a memory core with more ports or partitioning the array 'A'.
+WARNING: [SCHED 204-69] Unable to schedule 'load' operation ('B_load_8', matmul.cpp:21) on array 'B' due to limited memory ports. Please consider using a memory core with more ports or partitioning the array 'B'.
+INFO: [SCHED 204-61] Pipelining result : Target II = 1, Final II = 32, Depth = 36.
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111]  Elapsed time: 10.924 seconds; current allocated memory: 79.831 MB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111]  Elapsed time: 0.251 seconds; current allocated memory: 80.845 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'matmul_top' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on function 'matmul_top' to 'ap_ctrl_hs'.
+INFO: [RTGEN 206-100] Finished creating RTL model for 'matmul_top'.
+INFO: [HLS 200-111]  Elapsed time: 0.349 seconds; current allocated memory: 82.504 MB.
+INFO: [HLS 200-111] Finished generating all RTL models Time (s): cpu = 00:00:02 ; elapsed = 00:00:13 . Memory (MB): peak = 135.285 ; gain = 52.754
+INFO: [SYSC 207-301] Generating SystemC RTL for matmul_top.
+INFO: [VHDL 208-304] Generating VHDL RTL for matmul_top.
+INFO: [VLOG 209-307] Generating Verilog RTL for matmul_top.
+INFO: [HLS 200-112] Total elapsed time: 13.35 seconds; peak allocated memory: 82.504 MB.
+==============================================================
+File generated on Sat Oct 31 00:01:23 +0800 2026
+Vivado(TM) HLS - High-Level Synthesis from C, C++ and SystemC v2018.3 (64-bit)
+SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+==============================================================
+INFO: [SYN 201-201] Setting up clock 'default' with a period of 10ns.
+INFO: [SYN 201-201] Setting up clock 'default' with an uncertainty of 0.1ns.
+INFO: [HLS 200-10] Setting target device to 'xc7a100tcsg324-1'
+INFO: [SIM 211-2] *************** CSIM start ***************
+INFO: [SIM 211-4] CSIM will launch GCC as the compiler.
+INFO: [SIM 211-1] CSim done with 0 errors.
+INFO: [SIM 211-3] *************** CSIM finish ***************
+==============================================================
+File generated on Sat Oct 31 00:02:16 +0800 2026
+Vivado(TM) HLS - High-Level Synthesis from C, C++ and SystemC v2018.3 (64-bit)
+SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+==============================================================
+INFO: [SYN 201-201] Setting up clock 'default' with a period of 10ns.
+INFO: [SYN 201-201] Setting up clock 'default' with an uncertainty of 0.1ns.
+INFO: [HLS 200-10] Setting target device to 'xc7a100tcsg324-1'
+INFO: [SCHED 204-61] Option 'relax_ii_for_timing' is enabled, will increase II to preserve clock frequency constraints.
+INFO: [HLS 200-10] Analyzing design file 'matmul.cpp' ... 
+INFO: [HLS 200-111] Finished Linking Time (s): cpu = 00:00:00 ; elapsed = 00:00:10 . Memory (MB): peak = 103.516 ; gain = 20.762
+INFO: [HLS 200-111] Finished Checking Pragmas Time (s): cpu = 00:00:00 ; elapsed = 00:00:10 . Memory (MB): peak = 103.516 ; gain = 20.762
+INFO: [HLS 200-10] Starting code transformations ...
+INFO: [HLS 200-111] Finished Standard Transforms Time (s): cpu = 00:00:00 ; elapsed = 00:00:10 . Memory (MB): peak = 104.629 ; gain = 21.875
+INFO: [HLS 200-10] Checking synthesizability ...
+INFO: [HLS 200-111] Finished Checking Synthesizability Time (s): cpu = 00:00:00 ; elapsed = 00:00:10 . Memory (MB): peak = 104.883 ; gain = 22.129
+INFO: [XFORM 203-502] Unrolling all sub-loops inside loop 'I' (matmul.cpp:14) in function 'matmul_top' for pipelining.
+INFO: [HLS 200-489] Unrolling loop 'J' (matmul.cpp:16) in function 'matmul_top' completely with a factor of 8.
+INFO: [HLS 200-489] Unrolling loop 'K' (matmul.cpp:19) in function 'matmul_top' completely with a factor of 8.
+INFO: [XFORM 203-11] Balancing expressions in function 'matmul_top' (matmul.cpp:10)...56 expression(s) balanced.
+INFO: [HLS 200-111] Finished Pre-synthesis Time (s): cpu = 00:00:00 ; elapsed = 00:00:11 . Memory (MB): peak = 126.613 ; gain = 43.859
+INFO: [HLS 200-111] Finished Architecture Synthesis Time (s): cpu = 00:00:00 ; elapsed = 00:00:11 . Memory (MB): peak = 126.734 ; gain = 43.980
+INFO: [HLS 200-10] Starting hardware synthesis ...
+INFO: [HLS 200-10] Synthesizing 'matmul_top' ...
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'matmul_top' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-61] Pipelining loop 'I'.
+WARNING: [SCHED 204-69] Unable to schedule 'load' operation ('A_load_2', matmul.cpp:21) on array 'A' due to limited memory ports. Please consider using a memory core with more ports or partitioning the array 'A'.
+WARNING: [SCHED 204-69] Unable to schedule 'load' operation ('B_load_8', matmul.cpp:21) on array 'B' due to limited memory ports. Please consider using a memory core with more ports or partitioning the array 'B'.
+INFO: [SCHED 204-61] Pipelining result : Target II = 1, Final II = 32, Depth = 36.
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111]  Elapsed time: 11.33 seconds; current allocated memory: 79.862 MB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111]  Elapsed time: 0.258 seconds; current allocated memory: 80.876 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'matmul_top' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on function 'matmul_top' to 'ap_ctrl_hs'.
+INFO: [RTGEN 206-100] Finished creating RTL model for 'matmul_top'.
+INFO: [HLS 200-111]  Elapsed time: 0.354 seconds; current allocated memory: 82.520 MB.
+INFO: [HLS 200-111] Finished generating all RTL models Time (s): cpu = 00:00:02 ; elapsed = 00:00:14 . Memory (MB): peak = 135.590 ; gain = 52.836
+INFO: [SYSC 207-301] Generating SystemC RTL for matmul_top.
+INFO: [VHDL 208-304] Generating VHDL RTL for matmul_top.
+INFO: [VLOG 209-307] Generating Verilog RTL for matmul_top.
+INFO: [HLS 200-112] Total elapsed time: 13.794 seconds; peak allocated memory: 82.520 MB.
+==============================================================
+File generated on Sat Oct 31 00:03:41 +0800 2026
+Vivado(TM) HLS - High-Level Synthesis from C, C++ and SystemC v2018.3 (64-bit)
+SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+==============================================================
+INFO: [SYN 201-201] Setting up clock 'default' with a period of 10ns.
+INFO: [SYN 201-201] Setting up clock 'default' with an uncertainty of 0.1ns.
+INFO: [HLS 200-10] Setting target device to 'xc7a100tcsg324-1'
+INFO: [SCHED 204-61] Option 'relax_ii_for_timing' is enabled, will increase II to preserve clock frequency constraints.
+INFO: [HLS 200-10] Analyzing design file 'matmul.cpp' ... 
+INFO: [HLS 200-111] Finished Linking Time (s): cpu = 00:00:00 ; elapsed = 00:00:10 . Memory (MB): peak = 103.504 ; gain = 20.691
+INFO: [HLS 200-111] Finished Checking Pragmas Time (s): cpu = 00:00:00 ; elapsed = 00:00:10 . Memory (MB): peak = 103.504 ; gain = 20.691
+INFO: [HLS 200-10] Starting code transformations ...
+INFO: [HLS 200-111] Finished Standard Transforms Time (s): cpu = 00:00:00 ; elapsed = 00:00:10 . Memory (MB): peak = 104.645 ; gain = 21.832
+INFO: [HLS 200-10] Checking synthesizability ...
+INFO: [HLS 200-111] Finished Checking Synthesizability Time (s): cpu = 00:00:00 ; elapsed = 00:00:10 . Memory (MB): peak = 104.898 ; gain = 22.086
+INFO: [XFORM 203-502] Unrolling all sub-loops inside loop 'I' (matmul.cpp:14) in function 'matmul_top' for pipelining.
+INFO: [HLS 200-489] Unrolling loop 'J' (matmul.cpp:16) in function 'matmul_top' completely with a factor of 8.
+INFO: [HLS 200-489] Unrolling loop 'K' (matmul.cpp:19) in function 'matmul_top' completely with a factor of 8.
+INFO: [XFORM 203-101] Partitioning array 'A' (matmul.cpp:10) in dimension 2 completely.
+INFO: [XFORM 203-101] Partitioning array 'B' (matmul.cpp:10) in dimension 1 completely.
+INFO: [XFORM 203-11] Balancing expressions in function 'matmul_top' (matmul.cpp:10)...56 expression(s) balanced.
+INFO: [HLS 200-111] Finished Pre-synthesis Time (s): cpu = 00:00:00 ; elapsed = 00:00:11 . Memory (MB): peak = 126.930 ; gain = 44.117
+INFO: [HLS 200-111] Finished Architecture Synthesis Time (s): cpu = 00:00:01 ; elapsed = 00:00:11 . Memory (MB): peak = 126.930 ; gain = 44.117
+INFO: [HLS 200-10] Starting hardware synthesis ...
+INFO: [HLS 200-10] Synthesizing 'matmul_top' ...
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'matmul_top' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-61] Pipelining loop 'I'.
+WARNING: [SCHED 204-69] Unable to schedule 'load' operation ('B_0_load_2', matmul.cpp:21) on array 'B_0' due to limited memory ports. Please consider using a memory core with more ports or partitioning the array 'B_0'.
+INFO: [SCHED 204-61] Pipelining result : Target II = 1, Final II = 4, Depth = 8.
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111]  Elapsed time: 11.208 seconds; current allocated memory: 80.019 MB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111]  Elapsed time: 0.259 seconds; current allocated memory: 81.131 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'matmul_top' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_0' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_1' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_2' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_3' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_4' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_5' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_6' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_7' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_0' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_1' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_2' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_3' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_4' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_5' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_6' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_7' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on function 'matmul_top' to 'ap_ctrl_hs'.
+INFO: [RTGEN 206-100] Finished creating RTL model for 'matmul_top'.
+INFO: [HLS 200-111]  Elapsed time: 0.517 seconds; current allocated memory: 82.330 MB.
+INFO: [HLS 200-111] Finished generating all RTL models Time (s): cpu = 00:00:03 ; elapsed = 00:00:15 . Memory (MB): peak = 137.531 ; gain = 54.719
+INFO: [SYSC 207-301] Generating SystemC RTL for matmul_top.
+INFO: [VHDL 208-304] Generating VHDL RTL for matmul_top.
+INFO: [VLOG 209-307] Generating Verilog RTL for matmul_top.
+INFO: [HLS 200-112] Total elapsed time: 14.998 seconds; peak allocated memory: 82.330 MB.
+==============================================================
+File generated on Sat Oct 31 00:07:33 +0800 2026
+Vivado(TM) HLS - High-Level Synthesis from C, C++ and SystemC v2018.3 (64-bit)
+SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+==============================================================
+INFO: [SYN 201-201] Setting up clock 'default' with a period of 10ns.
+INFO: [SYN 201-201] Setting up clock 'default' with an uncertainty of 0.1ns.
+INFO: [HLS 200-10] Setting target device to 'xc7a100tcsg324-1'
+INFO: [SCHED 204-61] Option 'relax_ii_for_timing' is enabled, will increase II to preserve clock frequency constraints.
+INFO: [HLS 200-10] Analyzing design file 'matmul.cpp' ... 
+INFO: [HLS 200-111] Finished Linking Time (s): cpu = 00:00:00 ; elapsed = 00:00:10 . Memory (MB): peak = 103.496 ; gain = 20.539
+INFO: [HLS 200-111] Finished Checking Pragmas Time (s): cpu = 00:00:00 ; elapsed = 00:00:10 . Memory (MB): peak = 103.496 ; gain = 20.539
+INFO: [HLS 200-10] Starting code transformations ...
+INFO: [HLS 200-111] Finished Standard Transforms Time (s): cpu = 00:00:00 ; elapsed = 00:00:10 . Memory (MB): peak = 104.625 ; gain = 21.668
+INFO: [HLS 200-10] Checking synthesizability ...
+INFO: [HLS 200-111] Finished Checking Synthesizability Time (s): cpu = 00:00:00 ; elapsed = 00:00:10 . Memory (MB): peak = 104.887 ; gain = 21.930
+INFO: [XFORM 203-502] Unrolling all sub-loops inside loop 'I' (matmul.cpp:14) in function 'matmul_top' for pipelining.
+INFO: [HLS 200-489] Unrolling loop 'J' (matmul.cpp:16) in function 'matmul_top' completely with a factor of 8.
+INFO: [HLS 200-489] Unrolling loop 'K' (matmul.cpp:19) in function 'matmul_top' completely with a factor of 8.
+INFO: [XFORM 203-101] Partitioning array 'A' (matmul.cpp:10) in dimension 2 completely.
+INFO: [XFORM 203-101] Partitioning array 'B' (matmul.cpp:10) in dimension 1 completely.
+INFO: [XFORM 203-101] Partitioning array 'C' (matmul.cpp:10) in dimension 2 completely.
+INFO: [XFORM 203-11] Balancing expressions in function 'matmul_top' (matmul.cpp:10)...56 expression(s) balanced.
+INFO: [HLS 200-111] Finished Pre-synthesis Time (s): cpu = 00:00:00 ; elapsed = 00:00:11 . Memory (MB): peak = 127.016 ; gain = 44.059
+INFO: [HLS 200-111] Finished Architecture Synthesis Time (s): cpu = 00:00:00 ; elapsed = 00:00:11 . Memory (MB): peak = 127.090 ; gain = 44.133
+INFO: [HLS 200-10] Starting hardware synthesis ...
+INFO: [HLS 200-10] Synthesizing 'matmul_top' ...
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'matmul_top' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-61] Pipelining loop 'I'.
+WARNING: [SCHED 204-69] Unable to schedule 'load' operation ('B_4_load_2', matmul.cpp:21) on array 'B_4' due to limited memory ports. Please consider using a memory core with more ports or partitioning the array 'B_4'.
+INFO: [SCHED 204-61] Pipelining result : Target II = 1, Final II = 4, Depth = 8.
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111]  Elapsed time: 11.138 seconds; current allocated memory: 79.931 MB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111]  Elapsed time: 0.239 seconds; current allocated memory: 81.030 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'matmul_top' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_0' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_1' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_2' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_3' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_4' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_5' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_6' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_7' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_0' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_1' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_2' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_3' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_4' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_5' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_6' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_7' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C_0' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C_1' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C_2' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C_3' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C_4' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C_5' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C_6' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C_7' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on function 'matmul_top' to 'ap_ctrl_hs'.
+INFO: [RTGEN 206-100] Finished creating RTL model for 'matmul_top'.
+INFO: [HLS 200-111]  Elapsed time: 0.569 seconds; current allocated memory: 82.144 MB.
+INFO: [HLS 200-111] Finished generating all RTL models Time (s): cpu = 00:00:02 ; elapsed = 00:00:15 . Memory (MB): peak = 137.871 ; gain = 54.914
+INFO: [SYSC 207-301] Generating SystemC RTL for matmul_top.
+INFO: [VHDL 208-304] Generating VHDL RTL for matmul_top.
+INFO: [VLOG 209-307] Generating Verilog RTL for matmul_top.
+INFO: [HLS 200-112] Total elapsed time: 15.473 seconds; peak allocated memory: 82.144 MB.
+==============================================================
+File generated on Sat Oct 31 00:09:20 +0800 2026
+Vivado(TM) HLS - High-Level Synthesis from C, C++ and SystemC v2018.3 (64-bit)
+SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+==============================================================
+INFO: [SYN 201-201] Setting up clock 'default' with a period of 10ns.
+INFO: [SYN 201-201] Setting up clock 'default' with an uncertainty of 0.1ns.
+INFO: [HLS 200-10] Setting target device to 'xc7a100tcsg324-1'
+INFO: [SCHED 204-61] Option 'relax_ii_for_timing' is enabled, will increase II to preserve clock frequency constraints.
+INFO: [HLS 200-10] Analyzing design file 'matmul.cpp' ... 
+INFO: [HLS 200-111] Finished Linking Time (s): cpu = 00:00:00 ; elapsed = 00:00:10 . Memory (MB): peak = 103.684 ; gain = 20.211
+INFO: [HLS 200-111] Finished Checking Pragmas Time (s): cpu = 00:00:00 ; elapsed = 00:00:10 . Memory (MB): peak = 103.684 ; gain = 20.211
+INFO: [HLS 200-10] Starting code transformations ...
+INFO: [HLS 200-111] Finished Standard Transforms Time (s): cpu = 00:00:00 ; elapsed = 00:00:10 . Memory (MB): peak = 104.824 ; gain = 21.352
+INFO: [HLS 200-10] Checking synthesizability ...
+INFO: [HLS 200-111] Finished Checking Synthesizability Time (s): cpu = 00:00:00 ; elapsed = 00:00:10 . Memory (MB): peak = 105.078 ; gain = 21.605
+INFO: [XFORM 203-502] Unrolling all sub-loops inside loop 'I' (matmul.cpp:14) in function 'matmul_top' for pipelining.
+INFO: [HLS 200-489] Unrolling loop 'J' (matmul.cpp:16) in function 'matmul_top' completely with a factor of 8.
+INFO: [HLS 200-489] Unrolling loop 'K' (matmul.cpp:19) in function 'matmul_top' completely with a factor of 8.
+INFO: [XFORM 203-101] Partitioning array 'A' (matmul.cpp:10) in dimension 2 completely.
+INFO: [XFORM 203-101] Partitioning array 'B' (matmul.cpp:10) in dimension 1 completely.
+INFO: [XFORM 203-101] Partitioning array 'C' (matmul.cpp:10) in dimension 1 completely.
+INFO: [XFORM 203-11] Balancing expressions in function 'matmul_top' (matmul.cpp:10)...104 expression(s) balanced.
+INFO: [HLS 200-111] Finished Pre-synthesis Time (s): cpu = 00:00:01 ; elapsed = 00:00:11 . Memory (MB): peak = 127.742 ; gain = 44.270
+INFO: [HLS 200-111] Finished Architecture Synthesis Time (s): cpu = 00:00:01 ; elapsed = 00:00:11 . Memory (MB): peak = 127.801 ; gain = 44.328
+INFO: [HLS 200-10] Starting hardware synthesis ...
+INFO: [HLS 200-10] Synthesizing 'matmul_top' ...
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'matmul_top' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-61] Pipelining loop 'I'.
+WARNING: [SCHED 204-69] Unable to schedule 'load' operation ('B_0_load_2', matmul.cpp:21) on array 'B_0' due to limited memory ports. Please consider using a memory core with more ports or partitioning the array 'B_0'.
+INFO: [SCHED 204-61] Pipelining result : Target II = 1, Final II = 4, Depth = 8.
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111]  Elapsed time: 11.25 seconds; current allocated memory: 80.976 MB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111]  Elapsed time: 0.315 seconds; current allocated memory: 82.450 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'matmul_top' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_0' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_1' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_2' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_3' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_4' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_5' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_6' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_7' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_0' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_1' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_2' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_3' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_4' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_5' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_6' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_7' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C_0' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C_1' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C_2' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C_3' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C_4' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C_5' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C_6' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C_7' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on function 'matmul_top' to 'ap_ctrl_hs'.
+INFO: [RTGEN 206-100] Finished creating RTL model for 'matmul_top'.
+INFO: [HLS 200-111]  Elapsed time: 0.666 seconds; current allocated memory: 83.885 MB.
+INFO: [HLS 200-111] Finished generating all RTL models Time (s): cpu = 00:00:03 ; elapsed = 00:00:16 . Memory (MB): peak = 142.285 ; gain = 58.812
+INFO: [SYSC 207-301] Generating SystemC RTL for matmul_top.
+INFO: [VHDL 208-304] Generating VHDL RTL for matmul_top.
+INFO: [VLOG 209-307] Generating Verilog RTL for matmul_top.
+INFO: [HLS 200-112] Total elapsed time: 16.155 seconds; peak allocated memory: 83.885 MB.
+==============================================================
+File generated on Sat Oct 31 00:10:02 +0800 2026
+Vivado(TM) HLS - High-Level Synthesis from C, C++ and SystemC v2018.3 (64-bit)
+SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+==============================================================
+INFO: [SYN 201-201] Setting up clock 'default' with a period of 10ns.
+INFO: [SYN 201-201] Setting up clock 'default' with an uncertainty of 0.1ns.
+INFO: [HLS 200-10] Setting target device to 'xc7a100tcsg324-1'
+INFO: [SIM 211-2] *************** CSIM start ***************
+INFO: [SIM 211-4] CSIM will launch GCC as the compiler.
+INFO: [SIM 211-1] CSim done with 0 errors.
+INFO: [SIM 211-3] *************** CSIM finish ***************
+==============================================================
+File generated on Sat Oct 31 00:10:16 +0800 2026
+Vivado(TM) HLS - High-Level Synthesis from C, C++ and SystemC v2018.3 (64-bit)
+SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+==============================================================
+INFO: [SYN 201-201] Setting up clock 'default' with a period of 10ns.
+INFO: [SYN 201-201] Setting up clock 'default' with an uncertainty of 0.1ns.
+INFO: [HLS 200-10] Setting target device to 'xc7a100tcsg324-1'
+INFO: [SCHED 204-61] Option 'relax_ii_for_timing' is enabled, will increase II to preserve clock frequency constraints.
+INFO: [HLS 200-10] Analyzing design file 'matmul.cpp' ... 
+INFO: [HLS 200-111] Finished Linking Time (s): cpu = 00:00:00 ; elapsed = 00:00:10 . Memory (MB): peak = 103.660 ; gain = 20.641
+INFO: [HLS 200-111] Finished Checking Pragmas Time (s): cpu = 00:00:00 ; elapsed = 00:00:10 . Memory (MB): peak = 103.660 ; gain = 20.641
+INFO: [HLS 200-10] Starting code transformations ...
+INFO: [HLS 200-111] Finished Standard Transforms Time (s): cpu = 00:00:00 ; elapsed = 00:00:10 . Memory (MB): peak = 104.820 ; gain = 21.801
+INFO: [HLS 200-10] Checking synthesizability ...
+INFO: [HLS 200-111] Finished Checking Synthesizability Time (s): cpu = 00:00:00 ; elapsed = 00:00:10 . Memory (MB): peak = 104.820 ; gain = 21.801
+INFO: [XFORM 203-502] Unrolling all sub-loops inside loop 'I' (matmul.cpp:14) in function 'matmul_top' for pipelining.
+INFO: [HLS 200-489] Unrolling loop 'J' (matmul.cpp:16) in function 'matmul_top' completely with a factor of 8.
+INFO: [HLS 200-489] Unrolling loop 'K' (matmul.cpp:19) in function 'matmul_top' completely with a factor of 8.
+INFO: [XFORM 203-101] Partitioning array 'A' (matmul.cpp:10) in dimension 2 completely.
+INFO: [XFORM 203-101] Partitioning array 'B' (matmul.cpp:10) in dimension 1 completely.
+INFO: [XFORM 203-101] Partitioning array 'C' (matmul.cpp:10) in dimension 2 completely.
+INFO: [XFORM 203-11] Balancing expressions in function 'matmul_top' (matmul.cpp:10)...56 expression(s) balanced.
+INFO: [HLS 200-111] Finished Pre-synthesis Time (s): cpu = 00:00:00 ; elapsed = 00:00:11 . Memory (MB): peak = 127.043 ; gain = 44.023
+INFO: [HLS 200-111] Finished Architecture Synthesis Time (s): cpu = 00:00:00 ; elapsed = 00:00:11 . Memory (MB): peak = 127.043 ; gain = 44.023
+INFO: [HLS 200-10] Starting hardware synthesis ...
+INFO: [HLS 200-10] Synthesizing 'matmul_top' ...
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'matmul_top' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-61] Pipelining loop 'I'.
+WARNING: [SCHED 204-69] Unable to schedule 'load' operation ('B_4_load_2', matmul.cpp:21) on array 'B_4' due to limited memory ports. Please consider using a memory core with more ports or partitioning the array 'B_4'.
+INFO: [SCHED 204-61] Pipelining result : Target II = 1, Final II = 4, Depth = 8.
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111]  Elapsed time: 11.12 seconds; current allocated memory: 79.931 MB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111]  Elapsed time: 0.246 seconds; current allocated memory: 81.030 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'matmul_top' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_0' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_1' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_2' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_3' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_4' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_5' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_6' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_7' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_0' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_1' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_2' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_3' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_4' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_5' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_6' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_7' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C_0' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C_1' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C_2' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C_3' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C_4' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C_5' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C_6' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C_7' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on function 'matmul_top' to 'ap_ctrl_hs'.
+INFO: [RTGEN 206-100] Finished creating RTL model for 'matmul_top'.
+INFO: [HLS 200-111]  Elapsed time: 0.583 seconds; current allocated memory: 82.144 MB.
+INFO: [HLS 200-111] Finished generating all RTL models Time (s): cpu = 00:00:02 ; elapsed = 00:00:15 . Memory (MB): peak = 137.715 ; gain = 54.695
+INFO: [SYSC 207-301] Generating SystemC RTL for matmul_top.
+INFO: [VHDL 208-304] Generating VHDL RTL for matmul_top.
+INFO: [VLOG 209-307] Generating Verilog RTL for matmul_top.
+INFO: [HLS 200-112] Total elapsed time: 15.397 seconds; peak allocated memory: 82.144 MB.
+==============================================================
+File generated on Sat Oct 31 00:16:35 +0800 2026
+Vivado(TM) HLS - High-Level Synthesis from C, C++ and SystemC v2018.3 (64-bit)
+SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+==============================================================
+INFO: [SYN 201-201] Setting up clock 'default' with a period of 10ns.
+INFO: [SYN 201-201] Setting up clock 'default' with an uncertainty of 0.1ns.
+INFO: [HLS 200-10] Setting target device to 'xc7a100tcsg324-1'
+INFO: [SCHED 204-61] Option 'relax_ii_for_timing' is enabled, will increase II to preserve clock frequency constraints.
+INFO: [HLS 200-10] Analyzing design file 'matmul.cpp' ... 
+INFO: [HLS 200-111] Finished Linking Time (s): cpu = 00:00:00 ; elapsed = 00:00:10 . Memory (MB): peak = 103.578 ; gain = 20.227
+INFO: [HLS 200-111] Finished Checking Pragmas Time (s): cpu = 00:00:00 ; elapsed = 00:00:10 . Memory (MB): peak = 103.578 ; gain = 20.227
+INFO: [HLS 200-10] Starting code transformations ...
+INFO: [HLS 200-111] Finished Standard Transforms Time (s): cpu = 00:00:00 ; elapsed = 00:00:10 . Memory (MB): peak = 104.871 ; gain = 21.520
+INFO: [HLS 200-10] Checking synthesizability ...
+INFO: [HLS 200-111] Finished Checking Synthesizability Time (s): cpu = 00:00:00 ; elapsed = 00:00:10 . Memory (MB): peak = 105.125 ; gain = 21.773
+INFO: [XFORM 203-502] Unrolling all sub-loops inside loop 'I' (matmul.cpp:14) in function 'matmul_top' for pipelining.
+INFO: [HLS 200-489] Unrolling loop 'J' (matmul.cpp:16) in function 'matmul_top' completely with a factor of 8.
+INFO: [HLS 200-489] Unrolling loop 'K' (matmul.cpp:19) in function 'matmul_top' completely with a factor of 8.
+INFO: [XFORM 203-101] Partitioning array 'A' (matmul.cpp:10) in dimension 2 completely.
+INFO: [XFORM 203-101] Partitioning array 'B' (matmul.cpp:10) in dimension 1 completely.
+INFO: [XFORM 203-101] Partitioning array 'C' (matmul.cpp:10) in dimension 2 completely.
+INFO: [XFORM 203-101] Partitioning array 'B' (matmul.cpp:10) in dimension 2 completely.
+INFO: [XFORM 203-11] Balancing expressions in function 'matmul_top' (matmul.cpp:10)...56 expression(s) balanced.
+INFO: [HLS 200-111] Finished Pre-synthesis Time (s): cpu = 00:00:00 ; elapsed = 00:00:11 . Memory (MB): peak = 127.289 ; gain = 43.938
+INFO: [HLS 200-111] Finished Architecture Synthesis Time (s): cpu = 00:00:01 ; elapsed = 00:00:11 . Memory (MB): peak = 127.363 ; gain = 44.012
+INFO: [HLS 200-10] Starting hardware synthesis ...
+INFO: [HLS 200-10] Synthesizing 'matmul_top' ...
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-42] -- Implementing module 'matmul_top' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [SCHED 204-11] Starting scheduling ...
+INFO: [SCHED 204-61] Pipelining loop 'I'.
+INFO: [SCHED 204-61] Pipelining result : Target II = 1, Final II = 1, Depth = 5.
+INFO: [SCHED 204-11] Finished scheduling.
+INFO: [HLS 200-111]  Elapsed time: 11.543 seconds; current allocated memory: 79.954 MB.
+INFO: [BIND 205-100] Starting micro-architecture generation ...
+INFO: [BIND 205-101] Performing variable lifetime analysis.
+INFO: [BIND 205-101] Exploring resource sharing.
+INFO: [BIND 205-101] Binding ...
+INFO: [BIND 205-100] Finished micro-architecture generation.
+INFO: [HLS 200-111]  Elapsed time: 0.213 seconds; current allocated memory: 80.965 MB.
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [HLS 200-10] -- Generating RTL for module 'matmul_top' 
+INFO: [HLS 200-10] ----------------------------------------------------------------
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_0' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_1' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_2' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_3' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_4' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_5' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_6' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/A_7' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_0_0' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_0_1' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_0_2' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_0_3' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_0_4' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_0_5' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_0_6' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_0_7' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_1_0' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_1_1' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_1_2' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_1_3' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_1_4' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_1_5' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_1_6' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_1_7' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_2_0' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_2_1' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_2_2' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_2_3' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_2_4' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_2_5' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_2_6' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_2_7' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_3_0' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_3_1' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_3_2' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_3_3' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_3_4' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_3_5' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_3_6' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_3_7' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_4_0' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_4_1' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_4_2' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_4_3' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_4_4' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_4_5' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_4_6' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_4_7' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_5_0' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_5_1' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_5_2' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_5_3' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_5_4' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_5_5' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_5_6' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_5_7' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_6_0' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_6_1' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_6_2' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_6_3' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_6_4' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_6_5' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_6_6' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_6_7' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_7_0' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_7_1' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_7_2' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_7_3' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_7_4' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_7_5' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_7_6' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/B_7_7' to 'ap_none'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C_0' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C_1' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C_2' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C_3' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C_4' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C_5' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C_6' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on port 'matmul_top/C_7' to 'ap_memory'.
+INFO: [RTGEN 206-500] Setting interface mode on function 'matmul_top' to 'ap_ctrl_hs'.
+INFO: [RTGEN 206-100] Finished creating RTL model for 'matmul_top'.
+INFO: [HLS 200-111]  Elapsed time: 1.252 seconds; current allocated memory: 82.785 MB.
+INFO: [HLS 200-111] Finished generating all RTL models Time (s): cpu = 00:00:03 ; elapsed = 00:00:17 . Memory (MB): peak = 140.102 ; gain = 56.750
+INFO: [SYSC 207-301] Generating SystemC RTL for matmul_top.
+INFO: [VHDL 208-304] Generating VHDL RTL for matmul_top.
+INFO: [VLOG 209-307] Generating Verilog RTL for matmul_top.
+INFO: [HLS 200-112] Total elapsed time: 16.805 seconds; peak allocated memory: 82.785 MB.

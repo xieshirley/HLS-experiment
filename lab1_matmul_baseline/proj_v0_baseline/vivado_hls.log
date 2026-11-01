@@ -1,0 +1,23 @@
+
+****** Vivado(TM) HLS - High-Level Synthesis from C, C++ and SystemC v2018.3 (64-bit)
+  **** SW Build 2405991 on Thu Dec  6 23:38:27 MST 2018
+  **** IP Build 2404404 on Fri Dec  7 01:43:56 MST 2018
+    ** Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
+
+source D:/software/vivado18_3/systemfile/Vivado/2018.3/scripts/vivado_hls/hls.tcl -notrace
+INFO: [HLS 200-10] Running 'D:/software/vivado18_3/systemfile/Vivado/2018.3/bin/unwrapped/win64.o/vivado_hls.exe'
+INFO: [HLS 200-10] For user 'Shirley' on host 'laptop-8s27527r' (Windows NT_amd64 version 6.2) on Fri Oct 30 22:30:59 +0800 2026
+INFO: [HLS 200-10] In directory 'D:/HLS/matmul_v0_baseline/proj_v0_baseline'
+D:HLSmatmul_v0_baselineproj_v0_baseline.project can't be opened.
+couldn't read file "D:HLSmatmul_v0_baselineproj_v0_baseline.project": no such file or directory
+    while executing
+"source D:HLSmatmul_v0_baselineproj_v0_baseline.project"
+    invoked from within
+"hls::main D:\HLS\matmul_v0_baseline\proj_v0_baseline\.project"
+    ("uplevel" body line 1)
+    invoked from within
+"uplevel 1 hls::main {*}$args"
+    (procedure "hls_proc" line 5)
+    invoked from within
+"hls_proc $argv"
+INFO: [Common 17-206] Exiting vivado_hls at Fri Oct 30 22:30:59 2026...

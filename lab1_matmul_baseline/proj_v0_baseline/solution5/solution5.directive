@@ -1,0 +1,44 @@
+<AutoPilot:ProjectResources xmlns:AutoPilot="com.autoesl.autopilot.ui.directiveView">
+    <sourceFile name="">
+        <directive functionName="matmul_top" label="J" functionLabel="">
+            <pragma name="UNROLL"/>
+        </directive>
+        <directive functionName="matmul_top" label="I" functionLabel="">
+            <pragma name="PIPELINE">
+                <option name="II" value="1"/>
+            </pragma>
+        </directive>
+        <directive functionName="matmul_top" label="K" functionLabel="">
+            <pragma name="UNROLL"/>
+        </directive>
+        <directive functionName="matmul_top" label="" functionLabel="">
+            <pragma name="ARRAY_PARTITION">
+                <option name="variable" value="A" positionalBoolean="4"/>
+                <option name="complete" value="" positionalBoolean="type"/>
+                <option name="dim" value="2"/>
+            </pragma>
+        </directive>
+        <directive functionName="matmul_top" label="" functionLabel="">
+            <pragma name="ARRAY_PARTITION">
+                <option name="variable" value="B" positionalBoolean="4"/>
+                <option name="complete" value="" positionalBoolean="type"/>
+                <option name="dim" value="1"/>
+            </pragma>
+        </directive>
+        <directive functionName="matmul_top" label="" functionLabel="">
+            <pragma name="ARRAY_PARTITION">
+                <option name="variable" value="C" positionalBoolean="4"/>
+                <option name="complete" value="" positionalBoolean="type"/>
+                <option name="dim" value="2"/>
+            </pragma>
+        </directive>
+        <directive functionName="matmul_top" label="" functionLabel="">
+            <pragma name="ARRAY_PARTITION">
+                <option name="variable" value="B" positionalBoolean="4"/>
+                <option name="complete" value="" positionalBoolean="type"/>
+                <option name="dim" value="2"/>
+            </pragma>
+        </directive>
+    </sourceFile>
+</AutoPilot:ProjectResources>
+
