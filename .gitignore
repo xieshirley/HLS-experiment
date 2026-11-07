@@ -7,3 +7,8 @@ syn/
 impl/
 .apc/
 .reference/
+
+# 实验二：Vivado IP 只保留配置（.xci），生成的 netlist / 综合 / 仿真产物不入库（可由 .xci 重新生成）
+/lab2_hdmi_loop/vivado_prj/hdmi_loop/hdmi_loop.srcs/sources_1/ip/**
+!/lab2_hdmi_loop/vivado_prj/hdmi_loop/hdmi_loop.srcs/sources_1/ip/**/
+!/lab2_hdmi_loop/vivado_prj/hdmi_loop/hdmi_loop.srcs/sources_1/ip/**/*.xci
