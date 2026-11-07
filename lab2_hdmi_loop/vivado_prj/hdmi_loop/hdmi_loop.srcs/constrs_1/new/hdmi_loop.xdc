@@ -50,3 +50,30 @@ set_property IOSTANDARD TMDS_33 [get_ports {data_hdmi_out_p[1]}]
 set_property IOSTANDARD TMDS_33 [get_ports {data_hdmi_out_n[2]}]
 set_property IOSTANDARD TMDS_33 [get_ports {data_hdmi_out_p[2]}]
 set_property IOSTANDARD LVCMOS33 [get_ports hdmi_out_oen]
+
+#=============================================================================
+# 像素时钟域约束（原 XDC 漏掉了！）
+#   pixel_clk / pixel_clk_5x 是从 HDMI 输入 TMDS 时钟里恢复出来的，
+#   不 create_clock 的话整个像素域（video_core / gauss3x3 / video_sync / dvi 编码）
+#   都是"未约束路径"，P&R 不会为 148.5MHz 做任何优化 —— 高斯核因此跑飞。
+#   1080p60：像素时钟 148.5MHz → 6.734ns
+#=============================================================================
+create_clock -period 6.734 -name pixel_clk [get_nets pixel_clk]
+
+# 像素域与 mmcm 出来的两个域（10MHz / 200MHz）是异步的，由 hdmi_rx 内部同步器跨域
+set_clock_groups -asynchronous \
+    -group [get_clocks -of_objects [get_nets pixel_clk]] \
+    -group [get_clocks clk_out1_mmcm] \
+    -group [get_clocks clk_out2_mmcm]
+
+# 异步复位/置位弧不做 recovery/removal 分析（hdmi_rx 原厂 RTL 的用法）
+# 异步复位/置位弧不做 recovery/removal 分析（只针对时序单元，避免误匹配 LUT 的 S 脚）
+set_false_path -to [get_pins -of_objects [get_cells -hier -filter {IS_SEQUENTIAL == 1}] -filter {REF_PIN_NAME == "R" || REF_PIN_NAME == "S"}]
+
+#=============================================================================
+# 调试 LED（达芬奇板：led[0]=R2 led[1]=R3 led[2]=V2 led[3]=Y2，LVCMOS33）
+#=============================================================================
+set_property -dict {PACKAGE_PIN R2 IOSTANDARD LVCMOS33} [get_ports {led[0]}]
+set_property -dict {PACKAGE_PIN R3 IOSTANDARD LVCMOS33} [get_ports {led[1]}]
+set_property -dict {PACKAGE_PIN V2 IOSTANDARD LVCMOS33} [get_ports {led[2]}]
+set_property -dict {PACKAGE_PIN Y2 IOSTANDARD LVCMOS33} [get_ports {led[3]}]
