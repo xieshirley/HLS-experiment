@@ -56,3 +56,24 @@ impl/
 /lab3_/
 /lab1_*/
 /lab2_hdmi_loop/vivado_prj/tb_offset.v
+# ===== Vivado HLS 工程目录（solution1/syn/csim 等生成物，6.4GB+3.1GB，绝不入库）=====
+/lab2_hdmi_loop/hls_prj/gauss3x3/gauss3x3/
+/lab2_hdmi_loop/hls_prj/rgb2gray/rgb2gray/
+/lab2_hdmi_loop/hls_prj/unsharp3x3/unsharp_prj/
+/lab2_hdmi_loop/hls_prj/sharp3x3/
+/lab2_hdmi_loop/hls_prj/**/*.png
+/lab2_hdmi_loop/hls_prj/**/vivado_hls.log
+
+# ===== 仿真目录里的临时副本 / 中间产物 =====
+/lab2_hdmi_loop/sim_check/*_ram.dat
+/lab2_hdmi_loop/sim_check/*.err
+/lab2_hdmi_loop/sim_check/*.out
+/lab2_hdmi_loop/sim_check/高斯核*
+# ===== Vivado 工程目录是 <工程名>.cache/.runs/.hw/... 形式（通配匹配）=====
+*.cache/
+*.runs/
+*.hw/
+*.sim/
+*.gen/
+*.ip_user_files/
+*.Xil/
