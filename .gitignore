@@ -1,4 +1,4 @@
-# ===== Vivado 工程生成物（可重新生成，不入库）=====
+﻿# ===== Vivado 工程生成物（可重新生成，不入库）=====
 .cache/
 .runs/
 .hw/
@@ -53,7 +53,6 @@ impl/
 /lab2_hdmi_loop/doc/*.jpg
 
 # ===== 其它实验 / 临时副本 =====
-/lab3_/
 /lab1_*/
 /lab2_hdmi_loop/vivado_prj/tb_offset.v
 # ===== Vivado HLS 工程目录（solution1/syn/csim 等生成物，6.4GB+3.1GB，绝不入库）=====
@@ -78,3 +77,4 @@ impl/
 *.ip_user_files/
 *.Xil/
 /lab2_hdmi_loop/sim_check/keyrun/
+# lab3_ 的生成物排除规则见 lab3_/.gitignore

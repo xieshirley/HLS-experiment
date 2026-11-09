@@ -1,0 +1,38 @@
+# ===== 实验三：只保留源码/脚本/报告，排除可重新生成的生成物 =====
+
+# Python 环境与缓存
+.venv/
+__pycache__/
+*.pyc
+
+# 数据集与模型权重（可重新下载/训练）
+data/
+model/*.pt
+
+# HLS 工程生成物（保留 nn.cpp/nn.h/tb_nn.cpp/weights.h/*.tcl）
+hls/nn_accel/nn_accel/
+hls/nn_accel/*.log
+hls/nn_accel/*.jou
+
+# Vivado 工程生成物（保留 vivado/*.tcl 与 *.xdc）
+vivado/lab3_prj/
+vivado/lab3_nn_prj/
+
+# 测试向量（quantize.py 生成）
+testdata/*.bin
+
+# 比特流 / 波形
+*.bit
+*.vcd
+*.wdb
+
+# 日志与临时目录
+logs/*.log
+_acl-recovery/
+_staging/
+_tmp/
+
+# doc/ 与实验报告：文档内容不上传 GitHub（保留本地）
+doc/
+实验三_实验报告.docx
+*.docx

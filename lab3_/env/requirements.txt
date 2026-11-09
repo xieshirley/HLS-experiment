@@ -1,0 +1,7 @@
+# 实验三 手写数字识别 —— 训练/上位机 Python 依赖（venv: lab3_/.venv, Python 3.13）
+# 安装：.venv\Scripts\python.exe -m pip install -r env\requirements.txt
+torch
+numpy
+matplotlib
+pyserial
+pillow
