@@ -15,10 +15,21 @@
 // Descriptions:        HDMI环回实验
 //
 //----------------------------------------------------------------------------------------
+// 实验二改造（任务一~任务四）：
+//   * 任务一/二：rgb2gray 灰度核、gauss3x3 高斯平滑核级联输出
+//   * 任务三：输出同步重建（HS/VS 走 SRL 延迟链、DE 定长延迟 + 像素 FIFO）
+//   * 任务四：按键运行时切换 4 档模式 + LED[1:0] 显示当前模式
+//             1) 顶层加 key[3:0] 输入端口，引脚抄自达芬奇官方 XDC（T1/U1/W2/T3）
+//             2) key_mode.v 做 15ms 计数消抖 + 上升沿检测，每按一次模式 +1（模 4）
+//             3) 4 选 1 mux 选通：直通 / 灰度 / 平滑 / 锐化
+//             4) 当前模式号输出到 led[1:0]，led[2]/led[3] 保留 FIFO 欠载/溢出诊断
+//----------------------------------------------------------------------------------------
 //****************************************************************************************//
 module hdmi_loop(
-    input               sys_clk,               //50M系统时钟
+    input               sys_clk,               //50M系统时钟（消抖用，始终在跑）
     input               rst_n,                 //系统复位，低有效
+    //按键（任务四）
+    input  [3:0]        key,                   //板上按键，按下为低电平；key[0] 切模式
     //hdmi in
     input               hdmi_ddc_scl_io,       //IIC时钟
     inout               hdmi_ddc_sda_io,       //IIC数据
@@ -35,7 +46,7 @@ module hdmi_loop(
     output [2:0]        data_hdmi_out_n,       //输出差分数据
     output [2:0]        data_hdmi_out_p,       //输出差分数据
     //debug led
-    output [3:0]        led                    //调试指示灯（驱动逻辑见文件末尾）
+    output [3:0]        led                    //led[1:0]=模式号，led[2]=欠载，led[3]=溢出
 );
 
 //wire define
@@ -52,12 +63,19 @@ wire [7:0]  gray_w;            //灰度核输出像素
 wire        gray_v;            //灰度核输出有效
 wire [7:0]  gauss_w;           //高斯平滑输出像素
 wire        gauss_v;           //高斯平滑输出有效
-wire        pix_und;           //像素 FIFO 欠载事件（1 拍脉冲）
-wire        pix_ovf;           //像素 FIFO 溢出事件（1 拍脉冲）
-wire [7:0]  sharp_w;           //锐化输出像素（比 gauss 晚 3 拍）
+wire [7:0]  sharp_w;           //锐化输出像素（比 gauss 晚 2 拍）
 wire        sharp_v;           //锐化输出有效
-wire [23:0] rgb_proc;
-wire        de_proc, hs_proc, vs_proc;
+
+//三路同步后的输出（灰度档 / 平滑档 / 锐化档）
+wire [23:0] rgb_gray, rgb_gauss, rgb_sharp;
+wire        de_gray, hs_gray, vs_gray;
+wire        de_gauss, hs_gauss, vs_gauss;
+wire        de_sharp, hs_sharp, vs_sharp;
+
+//FIFO 诊断事件
+wire        und_gray,  ovf_gray;
+wire        und_gauss, ovf_gauss;
+wire        und_sharp, ovf_sharp;
 
 //*****************************************************
 //**                    main code
@@ -103,29 +121,66 @@ hdmi_rx u_hdmi_rx(
     .hdmi_in_en    (hdmi_in_oen),    
     .hdmi_in_hpd   (hdmi_in_hpd)  
   );      
-   
- // HDMI解码封装层模块      
 
 //*****************************************************
-//**        视频处理：灰度核 + 高斯核 + 锐化 + 核外同步对齐
+//**   任务四①：按键消抖 + 模式号（sys_clk 域，15ms 计数消抖）
 //*****************************************************
-// 模式开关（只改这一行）：
-//   MODE = 0 → 直入直出：RGB 直接送编码器（不打拍，等同厂家原始环回）
-//   MODE = 1 → 灰度输出：rgb2gray（HS/VS 延迟 3 拍，DE 跟核 TVALID）
-//   MODE = 2 → 平滑输出：rgb2gray → gauss3x3（HS/VS 延迟 2205 拍 + 像素 FIFO）
-//   MODE = 3 → 锐化输出：sharp = 2*orig ? smooth（两级流水，
-//              同步延迟 2205 + 3 = 2208 拍；3 = FIFO同步读1 + 算术1 + 限幅1）
-localparam integer MODE         = 3;
+// 引脚（抄自达芬奇官方 DaVinci_FPGA_IO.xdc）：
+//   key[0]=T1  key[1]=U1  key[2]=W2  key[3]=T3   均为 LVCMOS33，按下为低
+// 用 key[0] 切模式，其余三位预留。
+wire [1:0] mode_gray_sys;   // 格雷码（sys_clk 域）
+wire [1:0] mode_bin_sys;    // 二进制（sys_clk 域，给 LED）
+wire       key_press;       // 消抖后"按下"脉冲（调试可用）
 
-// 锐化流相对 gauss 流多出的拍数：FIFO 同步读 1 + 第1级算术 1 + 第2级限幅 1
-localparam integer SHARP_PIPE   = 2;
-localparam integer SYNC_BASE    = 2211;   // 实测：gauss 流比输入 DE 晚 2211 拍
-localparam integer SYNC_MARGIN  = 0;      // 0 = 直接用实测值（留余量只会把黑条从左边缘挪到右边缘）
-localparam integer USE_FIFO_OUT_M = (MODE == 2) || (MODE == 3);
-localparam integer SYNC_LATENCY   = (MODE == 2) ? SYNC_BASE + SYNC_MARGIN :
-                                    (MODE == 3) ? SYNC_BASE + SYNC_MARGIN + SHARP_PIPE : 3;
+key_mode #(
+    .CLK_FREQ       (50_000_000),
+    .DEB_MS         (15),
+    .KEY_ACTIVE_LOW (1)
+) u_key_mode (
+    .clk        (sys_clk),
+    .rst_n      (rst_n),
+    .key_raw    (key[0]),
+    .mode_gray  (mode_gray_sys),
+    .mode_bin   (mode_bin_sys),
+    .key_press  (key_press)
+);
 
-// 核处理层：一次例化出三路流（灰度 / 平滑 / 锐化），由 MODE 在下面选一路
+//*****************************************************
+//**   任务四②：模式号跨到 pixel_clk 域（格雷码 → 2 级同步 → 译码）
+//*****************************************************
+// 格雷码每次只变 1 位，逐位两级同步是安全的（不会出现非法中间码）
+reg  [1:0] mode_meta;
+reg  [1:0] mode_gray_pix;
+
+always @(posedge pixel_clk) begin
+    if (rx_rst) begin
+        mode_meta     <= 2'b00;
+        mode_gray_pix <= 2'b00;
+    end else begin
+        mode_meta     <= mode_gray_sys;
+        mode_gray_pix <= mode_meta;
+    end
+end
+
+reg [1:0] mode_pix;      // 0=直通 1=灰度 2=平滑 3=锐化
+always @(*) begin
+    case (mode_gray_pix)
+        2'b00:   mode_pix = 2'd0;
+        2'b01:   mode_pix = 2'd1;
+        2'b11:   mode_pix = 2'd2;
+        default: mode_pix = 2'd3;
+    endcase
+end
+
+//*****************************************************
+//**   视频处理：灰度核 + 高斯核 + 锐化核 + 三路同步
+//*****************************************************
+// 锐化流相对 gauss 流多出的拍数（核内 7 级 vs 5 级流水）
+localparam integer SHARP_PIPE = 2;
+// 实测：gauss 流比输入 DE 晚 2211 拍（tb_offset：LAT=2205 时相位偏移 +6）
+localparam integer SYNC_BASE  = 2211;
+
+// 核处理层：一次例化出三路流（灰度 / 平滑 / 锐化）
 video_core u_video_core(
     .clk          (pixel_clk),      // 像素时钟
     .rst_n        (~rx_rst),        // 复位，低有效
@@ -137,51 +192,139 @@ video_core u_video_core(
     .gauss_out    (gauss_w),        // 高斯平滑像素
     .gauss_valid  (gauss_v),
     .gauss_ready  (1'b1),           // 下游不反压
-    .sharp_out    (sharp_w),        // 锐化像素（核内算，比 gauss 多 1 级流水）
+    .sharp_out    (sharp_w),        // 锐化像素（核内算，比 gauss 多 2 级流水）
     .sharp_valid  (sharp_v),
     .sharp_ready  (1'b1)
 );
 
 //-------------------------------------------------------------
-// 按 MODE 选一路像素流送同步模块（MODE 是常量，综合会折叠）
+// 任务四③：三路各自做同步重建（参数是编译期常量，所以用三个例化，
+//          而不是一个可运行时改延迟的模块 —— 后者要 RAM 延迟线，改动大且风险高）
+//   灰度档：LATENCY=3、DE 跟核 TVALID（USE_FIFO_OUT=0）
+//   平滑档：LATENCY=2211、定长 DE + 像素 FIFO
+//   锐化档：LATENCY=2213（= 2211 + 2）、定长 DE + 像素 FIFO
 //-------------------------------------------------------------
-wire [7:0] core_pix = (MODE == 1) ? gray_w  :
-                      (MODE == 2) ? gauss_w :
-                                    sharp_w;
-wire       core_vld = (MODE == 1) ? gray_v  :
-                      (MODE == 2) ? gauss_v :
-                                    sharp_v;
-
-// 同步只补 DE/HS/VS 的相位，像素永远从核/TVALID 取：
-//   USE_FIFO_OUT=0（MODE=1 灰度）→ de_out = 核 TVALID，像素直通
-//   USE_FIFO_OUT=1（MODE=2/3）   → de_out = 输入 DE 延迟 LATENCY 拍，像素走 FIFO
 video_sync #(
-    .LATENCY      (SYNC_LATENCY),     // 灰度 3 / 平滑 2205 / 锐化 2208 拍
-    .USE_FIFO_OUT (USE_FIFO_OUT_M)
-) u_video_sync(
+    .LATENCY      (3),
+    .USE_FIFO_OUT (0)
+) u_sync_gray(
     .clk        (pixel_clk),
     .rst_n      (~rx_rst),
-    .gray_in    (core_pix),
-    .gray_valid (core_vld),
+    .gray_in    (gray_w),
+    .gray_valid (gray_v),
     .de_in      (video_de),
     .hs_in      (video_hs),
     .vs_in      (video_vs),
-    .rgb_out    (rgb_proc),         // 送 dvi_transmitter_top
-    .de_out     (de_proc),
-    .hs_out     (hs_proc),
-    .vs_out     (vs_proc),
-    .und_evt    (pix_und),
-    .ovf_evt    (pix_ovf)
+    .rgb_out    (rgb_gray),
+    .de_out     (de_gray),
+    .hs_out     (hs_gray),
+    .vs_out     (vs_gray),
+    .und_evt    (und_gray),
+    .ovf_evt    (ovf_gray)
+);
+
+video_sync #(
+    .LATENCY      (SYNC_BASE),
+    .USE_FIFO_OUT (1)
+) u_sync_gauss(
+    .clk        (pixel_clk),
+    .rst_n      (~rx_rst),
+    .gray_in    (gauss_w),
+    .gray_valid (gauss_v),
+    .de_in      (video_de),
+    .hs_in      (video_hs),
+    .vs_in      (video_vs),
+    .rgb_out    (rgb_gauss),
+    .de_out     (de_gauss),
+    .hs_out     (hs_gauss),
+    .vs_out     (vs_gauss),
+    .und_evt    (und_gauss),
+    .ovf_evt    (ovf_gauss)
+);
+
+video_sync #(
+    .LATENCY      (SYNC_BASE + SHARP_PIPE),
+    .USE_FIFO_OUT (1)
+) u_sync_sharp(
+    .clk        (pixel_clk),
+    .rst_n      (~rx_rst),
+    .gray_in    (sharp_w),
+    .gray_valid (sharp_v),
+    .de_in      (video_de),
+    .hs_in      (video_hs),
+    .vs_in      (video_vs),
+    .rgb_out    (rgb_sharp),
+    .de_out     (de_sharp),
+    .hs_out     (hs_sharp),
+    .vs_out     (vs_sharp),
+    .und_evt    (und_sharp),
+    .ovf_evt    (ovf_sharp)
 );
 
 //*****************************************************
-//**   调试：每帧拍数统计 + ILA（pixel_clk 域，5 个 probe）
+//**   任务四④：模式号 4 选 1 mux → 编码器
 //*****************************************************
-// probe0 = video_de                     （输入数据有效）
-// probe1 = {vs_proc, hs_proc, de_proc, gauss_v, gray_v, video_vs, video_hs}
-// probe2 = {gauss_w[7:0], sharp_w[7:0]}
-// probe3 = 上一帧灰度核输出拍数（应 ≈ 1920×1080 = 2073600）
-// probe4 = 上一帧高斯核输出拍数（应 ≈ 2073600；为 0 说明高斯核没出数据）
+// 四路都在 pixel_clk 域，最终统一打一拍再送编码器（对四路是等量的 1 拍，
+// 不改变任何相对相位）。模式 0 就是厂家原始环回那根线。
+reg [23:0] enc_din_r;
+reg        enc_de_r, enc_hs_r, enc_vs_r;
+
+always @(posedge pixel_clk) begin
+    if (rx_rst) begin
+        enc_din_r <= 24'd0;
+        enc_de_r  <= 1'b0;
+        enc_hs_r  <= 1'b0;
+        enc_vs_r  <= 1'b0;
+    end else begin
+        case (mode_pix)
+            2'd0: begin   // 直通：hdmi_rx 原始输出
+                enc_din_r <= video_rgb;
+                enc_de_r  <= video_de;
+                enc_hs_r  <= video_hs;
+                enc_vs_r  <= video_vs;
+            end
+            2'd1: begin   // 灰度
+                enc_din_r <= rgb_gray;
+                enc_de_r  <= de_gray;
+                enc_hs_r  <= hs_gray;
+                enc_vs_r  <= vs_gray;
+            end
+            2'd2: begin   // 高斯平滑
+                enc_din_r <= rgb_gauss;
+                enc_de_r  <= de_gauss;
+                enc_hs_r  <= hs_gauss;
+                enc_vs_r  <= vs_gauss;
+            end
+            default: begin // 拉普拉斯锐化
+                enc_din_r <= rgb_sharp;
+                enc_de_r  <= de_sharp;
+                enc_hs_r  <= hs_sharp;
+                enc_vs_r  <= vs_sharp;
+            end
+        endcase
+    end
+end
+
+dvi_transmitter_top u_rgb2dvi_0(
+    .pclk           (pixel_clk),
+    .pclk_x5        (pixel_clk_5x),
+    .reset_n        (~rx_rst),
+                
+    .video_din      (enc_din_r),
+    .video_hsync    (enc_hs_r),
+    .video_vsync    (enc_vs_r),
+    .video_de       (enc_de_r),
+                
+    .tmds_clk_p     (clk_hdmi_out_p),
+    .tmds_clk_n     (clk_hdmi_out_n),
+    .tmds_data_p    (data_hdmi_out_p),
+    .tmds_data_n    (data_hdmi_out_n), 
+    .tmds_oen       (hdmi_out_oen)
+    );  
+
+//*****************************************************
+//**   调试：每帧拍数统计 + ILA（pixel_clk 域）
+//*****************************************************
 wire [23:0] dbg_gray_beats;
 wire [23:0] dbg_gauss_beats;
 
@@ -195,119 +338,48 @@ video_dbg u_video_dbg (
     .gauss_beats   (dbg_gauss_beats)
 );
 
+// probe0 = video_de
+// probe1 = {enc_vs, enc_hs, enc_de, gauss_v, gray_v, video_vs, video_hs}
+// probe2 = {gauss_w, sharp_w}
+// probe3 = 上一帧灰度核输出拍数（应 ≈ 2073600）
+// probe4 = 上一帧高斯核输出拍数（应 ≈ 2073600）
 dbg_ila u_dbg_ila (
     .clk    (pixel_clk),
     .probe0 (video_de),
-    .probe1 ({vs_proc, hs_proc, de_proc, gauss_v, gray_v, video_vs, video_hs}),
+    .probe1 ({enc_vs_r, enc_hs_r, enc_de_r, gauss_v, gray_v, video_vs, video_hs}),
     .probe2 ({gauss_w, sharp_w}),
     .probe3 (dbg_gray_beats),
     .probe4 (dbg_gauss_beats)
 );
 
 //*****************************************************
-//**   调试：把"每帧拍数"画成画面顶部的白条（不依赖 JTAG/ILA）
+//**   任务四⑤：LED
 //*****************************************************
-// 第 0 个有效行白条长度 = 灰度核上一帧拍数 / 8192（满格 ≈ 252 像素 ≈ 2,073,600 拍）
-// 第 1 个有效行白条长度 = 高斯核上一帧拍数 / 8192（长度 0 → 高斯核完全没出数）
-// 第 2 个有效行是固定 64 像素的橙色"心跳条"，用来确认叠加逻辑在跑
-// 本版与 hs/vs 极性无关，且条长封顶 400（统计值饱和也不会涂满整行）
-localparam integer DBG_BAR = 0;   // 0 = 关闭画面白条（改看 LED）
+// led[1:0] = 当前模式号（00=直通 01=灰度 10=平滑 11=锐化）
+//            取自 sys_clk 域，所以没有 HDMI 输入时按键依然能看到模式变化
+// led[2]   = 当前档的像素 FIFO 出现过欠载（DE 比数据早 -> 左黑条）
+// led[3]   = 当前档的像素 FIFO 出现过溢出（深度不够 -> 撕裂）
+//            两灯只在模式 2/3（FIFO 档）有意义，模式 0/1 恒灭
+assign led[1:0] = mode_bin_sys;
 
-reg  [11:0] dbg_col;                 // 行内 DE 计数
-reg  [11:0] dbg_row;                 // 有效行计数
-reg         de_d, vs_d;
-reg         de_seen;                 // 本帧是否已经出现过 de
-
-wire de_fall = de_d & ~de_proc;      // 每行一次
-wire vs_edge = vs_proc ^ vs_d;       // 任意极性都能识别
-
-wire [11:0] bar_gray  = (dbg_gray_beats[23:13]  > 12'd400) ? 12'd400 : dbg_gray_beats[23:13];
-wire [11:0] bar_gauss = (dbg_gauss_beats[23:13] > 12'd400) ? 12'd400 : dbg_gauss_beats[23:13];
-wire [11:0] bar_fixed = 12'd64;
-
-always @(posedge pixel_clk) begin
-    de_d <= de_proc;
-    vs_d <= vs_proc;
-
-    if (~rx_rst) begin
-        dbg_col <= 12'd0;
-        dbg_row <= 12'd0;
-        de_seen <= 1'b0;
-    end else begin
-        // 列：DE 期间自增，消隐期清零（与 hs 无关）
-        if (de_proc) dbg_col <= dbg_col + 12'd1;
-        else         dbg_col <= 12'd0;
-
-        // 行：vs 任意边沿重新起帧；每个 DE 结束算一行
-        if (vs_edge) begin
-            dbg_row <= 12'd0;
-            de_seen <= 1'b0;
-        end else if (de_proc) begin
-            de_seen <= 1'b1;
-        end else if (de_fall && de_seen) begin
-            dbg_row <= dbg_row + 12'd1;
-        end
-    end
-end
-
-wire [23:0] rgb_enc = (!DBG_BAR)                                     ? rgb_proc :
-                      ((dbg_row == 12'd0) && (dbg_col < bar_gray ))  ? 24'hFFFFFF :
-                      ((dbg_row == 12'd1) && (dbg_col < bar_gauss))  ? 24'hFFFFFF :
-                      ((dbg_row == 12'd2) && (dbg_col < bar_fixed))  ? 24'hFF8000 :
-                                                                       rgb_proc;
-
-//-------------------------------------------------------------
-// 编码器输入：
-//   MODE == 0 → 直入直出：hdmi_rx 输出直接进编码器（不打拍，
-//               就是厂家原始环回那根线；此模式下核处理链被综合裁掉）
-//   其它模式  → 走核处理 + 同步补偿后的 rgb_proc/de_proc/hs_proc/vs_proc
-//-------------------------------------------------------------
-wire [23:0] enc_din = (MODE == 0) ? video_rgb : rgb_enc;
-wire        enc_de  = (MODE == 0) ? video_de  : de_proc;
-wire        enc_hs  = (MODE == 0) ? video_hs  : hs_proc;
-wire        enc_vs  = (MODE == 0) ? video_vs  : vs_proc;
-
-
-dvi_transmitter_top u_rgb2dvi_0(
-    .pclk           (pixel_clk),
-    .pclk_x5        (pixel_clk_5x),
-    .reset_n        (~rx_rst),
-                
-    .video_din      (enc_din),
-    .video_hsync    (enc_hs),
-    .video_vsync    (enc_vs),
-    .video_de       (enc_de),
-                
-    .tmds_clk_p     (clk_hdmi_out_p),
-    .tmds_clk_n     (clk_hdmi_out_n),
-    .tmds_data_p    (data_hdmi_out_p),
-    .tmds_data_n    (data_hdmi_out_n), 
-    .tmds_oen       (hdmi_out_oen)
-    );  
-
-//*****************************************************
-//**   调试 LED（完全不碰视频通路，pixel_clk 域）
-//*****************************************************
-// led[0] = 高斯核上一帧有出数        → 常亮 = gauss 有输出
-// led[1] = 灰度核上一帧有出数        → 常亮 = gray  有输出
-// led[2] = 本帧像素 FIFO 出现过欠载（DE 比数据早 → 左黑条）
-// led[3] = 本帧像素 FIFO 出现过溢出（深度不够 → 撕裂/错位）
-//          两灯都灭 = 像素 FIFO 读写完全健康
-// 注意：板子 LED 若是低有效，亮灭含义整体反过来即可。
-assign led[0] = (dbg_gauss_beats != 24'd0);
-assign led[1] = (dbg_gray_beats  != 24'd0);
+wire und_sel = (mode_pix == 2'd2) ? und_gauss :
+               (mode_pix == 2'd3) ? und_sharp : 1'b0;
+wire ovf_sel = (mode_pix == 2'd2) ? ovf_gauss :
+               (mode_pix == 2'd3) ? ovf_sharp : 1'b0;
 
 reg und_seen, ovf_seen;
-reg vs_proc_d;
+reg vs_enc_d;
 always @(posedge pixel_clk) begin
-    vs_proc_d <= vs_proc;
-    if (~rx_rst) begin
-        und_seen <= 1'b0; ovf_seen <= 1'b0;
-    end else if (vs_proc && !vs_proc_d) begin
-        und_seen <= 1'b0; ovf_seen <= 1'b0;      // 每帧清零
+    vs_enc_d <= enc_vs_r;
+    if (rx_rst) begin
+        und_seen <= 1'b0;
+        ovf_seen <= 1'b0;
+    end else if (enc_vs_r && !vs_enc_d) begin
+        und_seen <= 1'b0;            // 每帧清零
+        ovf_seen <= 1'b0;
     end else begin
-        if (pix_und) und_seen <= 1'b1;
-        if (pix_ovf) ovf_seen <= 1'b1;
+        if (und_sel) und_seen <= 1'b1;
+        if (ovf_sel) ovf_seen <= 1'b1;
     end
 end
 assign led[2] = und_seen;

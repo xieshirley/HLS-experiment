@@ -60,15 +60,21 @@ set_property IOSTANDARD LVCMOS33 [get_ports hdmi_out_oen]
 #=============================================================================
 create_clock -period 6.734 -name pixel_clk [get_nets pixel_clk]
 
-# 像素域与 mmcm 出来的两个域（10MHz / 200MHz）是异步的，由 hdmi_rx 内部同步器跨域
+#=============================================================================
+#=============================================================================
+# 异步时钟域划分（XDC 里不能写 if，全部用直接语句）
+#   sys_clk(50MHz/按键消抖)、clk_out1(10MHz)、clk_out2(200MHz)、
+#   pixel_clk(148.5MHz，从 HDMI 输入 TMDS 恢复) 四者互相异步：
+#     * hdmi_rx 内部用同步器跨 10M/200M 与像素域
+#     * 按键模式号用"格雷码 + 2 级同步器"跨到像素域（key_mode.v）
+#   不做 clock group 时，u_key_mode → mode_meta 会被按 6.734ns 分析，
+#   实测报 -3.392ns 违例（把异步当同步）。
+#=============================================================================
 set_clock_groups -asynchronous \
     -group [get_clocks -of_objects [get_nets pixel_clk]] \
+    -group [get_clocks -of_objects [get_ports sys_clk]] \
     -group [get_clocks clk_out1_mmcm] \
     -group [get_clocks clk_out2_mmcm]
-
-# 异步复位/置位弧不做 recovery/removal 分析（hdmi_rx 原厂 RTL 的用法）
-# 异步复位/置位弧不做 recovery/removal 分析（只针对时序单元，避免误匹配 LUT 的 S 脚）
-set_false_path -to [get_pins -of_objects [get_cells -hier -filter {IS_SEQUENTIAL == 1}] -filter {REF_PIN_NAME == "R" || REF_PIN_NAME == "S"}]
 
 #=============================================================================
 # 调试 LED（达芬奇板：led[0]=R2 led[1]=R3 led[2]=V2 led[3]=Y2，LVCMOS33）
@@ -77,3 +83,13 @@ set_property -dict {PACKAGE_PIN R2 IOSTANDARD LVCMOS33} [get_ports {led[0]}]
 set_property -dict {PACKAGE_PIN R3 IOSTANDARD LVCMOS33} [get_ports {led[1]}]
 set_property -dict {PACKAGE_PIN V2 IOSTANDARD LVCMOS33} [get_ports {led[2]}]
 set_property -dict {PACKAGE_PIN Y2 IOSTANDARD LVCMOS33} [get_ports {led[3]}]
+#=============================================================================
+# 任务四：按键引脚（抄自达芬奇官方 DaVinci_FPGA_IO.xdc）
+#   key[0]=T1   key[1]=U1   key[2]=W2   key[3]=T3   （均 LVCMOS33，按下为低）
+#   顶层只用 key[0] 切模式，其余三位预留但引脚必须约束（否则无法布线/会报错）
+#   sys_clk（50MHz 消抖时钟）已在文件开头 create_clock -period 20.000 + R4
+#=============================================================================
+set_property -dict {PACKAGE_PIN T1 IOSTANDARD LVCMOS33} [get_ports {key[0]}]
+set_property -dict {PACKAGE_PIN U1 IOSTANDARD LVCMOS33} [get_ports {key[1]}]
+set_property -dict {PACKAGE_PIN W2 IOSTANDARD LVCMOS33} [get_ports {key[2]}]
+set_property -dict {PACKAGE_PIN T3 IOSTANDARD LVCMOS33} [get_ports {key[3]}]

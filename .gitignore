@@ -77,3 +77,4 @@ impl/
 *.gen/
 *.ip_user_files/
 *.Xil/
+/lab2_hdmi_loop/sim_check/keyrun/

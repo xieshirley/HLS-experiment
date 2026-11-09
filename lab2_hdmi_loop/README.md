@@ -24,13 +24,11 @@ HDMI IN ──> hdmi_rx ──video_rgb/de/hs/vs──> video_core ──> video
 | **2** | 高斯平滑 | `gauss3x3` | 定长 DE 延迟 + 像素 FIFO（`USE_FIFO_OUT=1`） | 2211 拍 |
 | **3** | 拉普拉斯锐化 | `unsharp3x3` | 同上 | 2213 拍 |
 
-切换方式：改 `hdmi_loop.v` 顶部
+切换方式（任务四已实现**运行时**切换）：**按 KEY0 一次，模式 +1（模 4）**，
+当前模式显示在 `led[1:0]` 上（`00`=直通 `01`=灰度 `10`=平滑 `11`=锐化）。
 
-```verilog
-localparam integer MODE = 3;     // 0=直通 1=灰度 2=平滑 3=锐化
-```
-
-改完重新综合即可（每档一颗比特流）。MODE=0 时 `video_core` / `video_sync` 会被综合裁掉，资源最省。
+> 四档在硬件里**同时存在**（三路 `video_sync` 并行 + 4 选 1 mux），
+> 所以**一颗比特流覆盖全部四档**，不再需要为每档单独综合。
 
 ---
 
@@ -122,6 +120,69 @@ localparam integer SYNC_LATENCY = (MODE == 2) ? SYNC_BASE + SYNC_MARGIN :       
 
 ---
 
+## 4.5 任务四：按键运行时切换模式
+
+### 4.5.1 顶层改动
+
+| 改动 | 内容 |
+|---|---|
+| 新增端口 | `input [3:0] key`（按下为低） |
+| 新增模块 | `sources_1/new/key_mode.v`：消抖 + 边沿检测 + 模式计数 |
+| 三路同步并行 | `u_sync_gray`(LAT=3) / `u_sync_gauss`(LAT=2211) / `u_sync_sharp`(LAT=2213) |
+| 4 选 1 mux | 按 `mode_pix` 选 直通 / 灰度 / 平滑 / 锐化，统一打 1 拍后送 `dvi_transmitter_top` |
+| LED | `led[1:0]`=模式号，`led[2]`=当前档欠载，`led[3]`=当前档溢出 |
+
+### 4.5.2 消抖与跨时钟域
+
+```verilog
+key_mode #(.CLK_FREQ(50_000_000), .DEB_MS(15), .KEY_ACTIVE_LOW(1)) u_key_mode(...);
+```
+
+* **计数消抖**：电平必须稳定 **15 ms**（50 MHz → 750,000 拍）才被承认；
+  抖动期间计数器反复清零，短于 15 ms 的毛刺直接被吃掉。
+* **边沿检测**：只在「未按 → 按下」的消抖后跳变产生 1 拍脉冲 → **长按不会连跳**。
+* **模 4 计数用格雷码**：步进 `00→01→11→10→00`，每次只变 1 位；
+  这样跨到 `pixel_clk`（148.5 MHz）域时用普通 **2 级同步器**就安全，不会出现非法中间码。
+* 消抖跑在 **`sys_clk`（50 MHz，板上独立晶振）** 上，与 HDMI 有无输入无关；
+  `led[1:0]` 也取自 sys 域，所以**没有 HDMI 输入时按键仍能看到模式变化**。
+
+### 4.5.3 XDC 引脚（抄自达芬奇官方 `DaVinci_FPGA_IO.xdc`）
+
+```tcl
+# key[0]=T1  key[1]=U1  key[2]=W2  key[3]=T3  （LVCMOS33，按下为低）
+set_property -dict {PACKAGE_PIN T1 IOSTANDARD LVCMOS33} [get_ports {key[0]}]
+set_property -dict {PACKAGE_PIN U1 IOSTANDARD LVCMOS33} [get_ports {key[1]}]
+set_property -dict {PACKAGE_PIN W2 IOSTANDARD LVCMOS33} [get_ports {key[2]}]
+set_property -dict {PACKAGE_PIN T3 IOSTANDARD LVCMOS33} [get_ports {key[3]}]
+```
+
+`sys_clk`（50 MHz 消抖时钟）用官方引脚 **R4**，约束 `create_clock -period 20.000`。
+
+> **踩坑一**：加按键后 `u_key_mode → mode_meta`（sys_clk → pixel_clk）这条跨域路径
+> 被按 6.734 ns 分析，实测 **WNS −3.392 ns**。必须声明四域异步：
+>
+> ```tcl
+> set_clock_groups -asynchronous \
+>     -group [get_clocks -of_objects [get_nets pixel_clk]] \
+>     -group [get_clocks -of_objects [get_ports sys_clk]] \
+>     -group [get_clocks clk_out1_mmcm] \
+>     -group [get_clocks clk_out2_mmcm]
+> ```
+>
+> **踩坑二**：**XDC 文件不支持 `if` 语句**（`CRITICAL WARNING: Command 'if' is not supported`），
+> 我曾用 `if` 包裹这段约束，结果整段被忽略 → WNS 恶化到 −4.726 ns。去掉 `if` 后 **WNS +0.374 ns**。
+
+### 4.5.4 验证
+
+| 项 | 结果 |
+|---|---|
+| `tb_key_mode.v` | **PASS**：带抖动按一次只加 1；按住 60 ms 不连跳；连按 5 次 0→1→2→3→0→1（模 4 回绕）；5 ms 短脉冲被滤除；`key_press` 共 5 次 ✓ |
+| 综合/实现 | 0 error / 0 critical warning；**WNS +0.374 ns，无违例路径** |
+| 资源 | LUT 5356/20800（25.8%）、FF 4269/41600（10.3%）、BRAM 5/50、DSP 1/90（三路同步链使 LUT 从 4072 增到 5356） |
+| 引脚 | `key[0]=T1`、`key[1]=U1`、`key[2]=W2`、`key[3]=T3` 均已 FIXED |
+| 比特流 | `bit_out/hdmi_loop_V11_MODE_key_runtime.bit`（一颗覆盖四档） |
+
+---
 ## 5. 踩过的三个坑（详见 `doc/调试日志_实验2_最终版.md` §4、§11）
 
 **① XDC 缺像素时钟约束（决定性）**
@@ -248,7 +309,7 @@ lab2_hdmi_loop/
 
 ## 11. 已知限制
 
-* 模式切换是**编译期**的（`MODE` 常量），要实时切换需加按键 + 运行时寄存器选择；
+* 模式切换已**运行时化**（KEY0 循环 4 档）；若要一键直达某档，可扩成 4 个按键各自选一档；
 * 锐化**图像最外圈 1~2 像素会偏亮**：窗口在边界补 0，`5c − 4邻` 在边缘产生正向过冲，属算法固有；
   需要时可加"首末行/首尾列屏蔽"；
 * `gauss3x3` / `unsharp3x3` 的行长是 1921（1920 读 + 1 次行末补 0），因此**每行有 1 拍反压**，
