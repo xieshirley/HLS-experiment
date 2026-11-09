@@ -29,9 +29,9 @@ HDMI IN ─> hdmi_rx ─> video_core(rgb2gray + gauss3x3‖unsharp3x3) ─> vide
 - 资源（锐化档）：LUT 4072/20800（19.6%）、FF 4138/41600（10.0%）、BRAM 5/50、DSP 1/90
 - 时序：**WNS +0.151 ns，0 违例**
 
-设计细节与踩坑记录（像素时钟约束、帧末补 0 行导致的 FIFO 溢出、为什么锐化必须放进 HLS 核内）见
-[lab2_hdmi_loop/README.md](lab2_hdmi_loop/README.md) 以及 `lab2_hdmi_loop/doc/` 下的
-`调试日志_实验2_HDMI环回与高斯级联_完整版.md`、`修改日志_v5_回退f11b691骨架重写.md`。
+设计细节与踩坑记录见 [lab2_hdmi_loop/README.md](lab2_hdmi_loop/README.md)，
+完整调试过程（时间线 / 5 条根因 / 全部测量数据 / 废弃方案存档）见
+**[lab2_hdmi_loop/doc/调试日志_实验2_最终版.md](lab2_hdmi_loop/doc/调试日志_实验2_最终版.md)**。
 
 ## 目录结构
 

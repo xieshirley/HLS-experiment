@@ -118,9 +118,11 @@ localparam integer SYNC_LATENCY = (MODE == 2) ? SYNC_BASE + SYNC_MARGIN :       
 > 校准方法：若 `SYNC_LATENCY` 偏小 → DE 比数据早到 → 左边黑条 + `led[2]` 亮；
 > 偏大 → 数据被截 → 右边黑条。用 `led[2]/led[3]` 二分即可，不必靠肉眼数像素。
 
+完整推导与测量数据见 **[doc/调试日志_实验2_最终版.md](doc/调试日志_实验2_最终版.md)**。
+
 ---
 
-## 5. 踩过的三个坑（都在 `doc/` 的日志里）
+## 5. 踩过的三个坑（详见 `doc/调试日志_实验2_最终版.md` §4、§11）
 
 **① XDC 缺像素时钟约束（决定性）**
 `create_clock -period 6.734 -name pixel_clk [get_nets pixel_clk]` 漏写时，高斯核路径时序不收敛
@@ -139,6 +141,9 @@ localparam integer SYNC_LATENCY = (MODE == 2) ? SYNC_BASE + SYNC_MARGIN :       
 
 > 结论：**锐化必须放进 HLS 核内算**（核本来就有窗口中心像素），
 > 这样锐化流与已验证的平滑流架构完全同构，不再有任何帧边界对齐问题。
+
+三个坑的完整证据链（仿真输出、LED 读数、失败构建对比）见
+[doc/调试日志_实验2_最终版.md](doc/调试日志_实验2_最终版.md)。
 
 ---
 
