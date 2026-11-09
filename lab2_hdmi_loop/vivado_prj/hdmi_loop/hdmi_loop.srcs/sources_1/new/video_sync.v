@@ -35,27 +35,36 @@ module video_sync #(
     output     [23:0] rgb_out,      // 送 DVI 编码器
     output            de_out,
     output            hs_out,
-    output            vs_out
+    output            vs_out,
+    output            und_evt,     // 1 = 本拍 DE 有效但 FIFO 为空（欠载 -> 黑像素）
+    output            ovf_evt      // 1 = 本拍有像素因 FIFO 满被丢弃（溢出 -> 撕裂/错位）
 );
 
     //------------------------------------------------------------
     // 1. DE/HS/VS 精确延迟 LATENCY 拍（packed 移位链，无 for、无复位）
+    //    每拍移 3 位（de/hs/vs 各一位）→ 要求 3*LATENCY >= 4，
+    //    所以内部下限取 2 拍（LATENCY=1 时按 2 拍实现，误差 1 拍，
+    //    只影响"校准实验"里 2204/2203 拍的读数，不影响错位现象）
     //------------------------------------------------------------
-    reg  [3*LATENCY-1:0] sr;
+    localparam integer LAT = (LATENCY < 2) ? 2 : LATENCY;
+
+    reg  [3*LAT-1:0] sr;
 
     always @(posedge clk) begin
-        sr <= {sr[3*LATENCY-4:0], de_in, hs_in, vs_in};
+        sr <= {sr[3*LAT-4:0], de_in, hs_in, vs_in};
     end
 
-    wire de_del = sr[3*LATENCY-1];   // 每 3 位一组：de 在最高、hs 居中、vs 在最低
-    wire hs_del = sr[3*LATENCY-2];
-    wire vs_del = sr[3*LATENCY-3];
+    wire de_del = sr[3*LAT-1];   // 每 3 位一组：de 在最高、hs 居中、vs 在最低
+    wire hs_del = sr[3*LAT-2];
+    wire vs_del = sr[3*LAT-3];
 
     //------------------------------------------------------------
     // 2. 像素 FIFO：核输出写入（带抖动），按显示 DE 读出
     //    深度 512：核平均吞吐与显示 1:1，只需吸收抖动，永不溢出
     //------------------------------------------------------------
-    localparam integer FW = 9;
+    // 深度 4096：帧末那一行只写不读的补 0 行会在消隐期一次性吐出约 1920 个像素，
+    // FIFO 必须 >= 一整行才装得下（原来 512 深 -> 每帧溢出约 1400 个像素）。
+    localparam integer FW = 12;
     localparam integer FD = (1 << FW);
 
     reg  [7:0]  mem [0:FD-1];
@@ -82,6 +91,12 @@ module video_sync #(
     end
 
     wire [7:0] pix_fifo = (cnt != 0) ? mem[rp[FW-1:0]] : 8'd0;
+
+    // 欠载指示：DE 有效但 FIFO 为空 —— 说明 DE 比数据早到（延迟给小了）
+    assign und_evt = USE_FIFO_OUT ? (de_del & (cnt == 0)) : 1'b0;
+
+    // 溢出指示：有数据但 FIFO 满写不进去 —— 说明深度不够（帧边界突发装不下）
+    assign ovf_evt = USE_FIFO_OUT ? (gray_valid & full) : 1'b0;
 
     //------------------------------------------------------------
     // 3. 输出选择（参数常量化，综合时直接折叠，不用 generate）
