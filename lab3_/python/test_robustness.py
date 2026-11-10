@@ -1,5 +1,6 @@
 # test_robustness.py —— 健壮性：错包/乱码/截断后必须能重同步并继续识别
-import sys, time, random
+# 用法：.venv\Scripts\python.exe python\test_robustness.py --port COM6 --baud 1000000
+import argparse, sys, time, random
 import serial
 
 sys.path.insert(0, __file__.rsplit('\\', 1)[0])
@@ -17,13 +18,19 @@ def send_valid(ser, img, seq):
 
 
 def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--port', default='COM6')
+    ap.add_argument('--baud', type=int, default=115200)
+    args = ap.parse_args()
+
     (_, _), (teX, teY) = load_mnist('data')
-    ser = serial.Serial('COM6', 115200, timeout=1.0)
+    ser = serial.Serial(args.port, args.baud, timeout=1.0)
     time.sleep(0.3)
 
+    print(f'port={args.port} baud={args.baud}', flush=True)
     print('baseline      :', send_valid(ser, teX[0], 0), '(true', teY[0], ')', flush=True)
 
-    # 1) 图像字节被翻转 → CRC 错
+    # 1) 图像字节被翻转 -> CRC 错
     bad = bytearray(build_frame(teX[0].tobytes(), 1))
     bad[10] ^= 0xFF
     ser.write(bytes(bad)); ser.flush(); time.sleep(0.2)

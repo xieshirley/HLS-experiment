@@ -4,7 +4,7 @@
 #include <ap_int.h>
 
 // 实验三定点推理核（与 brief/方案书.md 一致）
-// Conv1(1->8,3x3)->MaxPool->Conv2(8->16,3x3)->MaxPool->FC(400->32->10)
+// Conv1(1->16,3x3)->MaxPool->Conv2(16->32,3x3)->MaxPool->FC(800->64->10)
 // 定点：激活 int8、权重 int8、累加 int32、每层移位 requant（2 的幂）
 
 typedef ap_int<32> acc_t;   // 累加器
