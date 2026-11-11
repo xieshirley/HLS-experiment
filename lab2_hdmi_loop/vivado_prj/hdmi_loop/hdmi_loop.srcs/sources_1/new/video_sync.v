@@ -70,6 +70,21 @@ module video_sync #(
     reg  [7:0]  mem [0:FD-1];
     reg  [FW:0] wp, rp;
 
+`ifndef SYNTHESIS
+    //------------------------------------------------------------
+    // 仿真专用：给 SRL 移位链和像素 FIFO 一个确定的初值。
+    //   不加这两句时，上电后前 LATENCY 拍 de/hs/vs 是 X、FIFO 未写过的
+    //   单元读出来也是 X —— 波形里就是"开头一片红色"。
+    //   综合时本段被 `ifndef SYNTHESIS 排除，BRAM/SRL 推断完全不变。
+    //------------------------------------------------------------
+    integer init_i;
+    initial begin
+        sr = {3*LAT{1'b0}};
+        for (init_i = 0; init_i < FD; init_i = init_i + 1)
+            mem[init_i] = 8'd0;
+    end
+`endif
+
     wire [FW:0] cnt  = wp - rp;
     wire        full = cnt[FW];
     wire        we   = gray_valid & ~full;         // 核有数据就写

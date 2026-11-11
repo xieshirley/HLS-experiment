@@ -136,7 +136,17 @@ module video_core(
     // 仿真自检：两个弹性 FIFO 的溢出与峰值占用
     //------------------------------------------------------------
     integer g_ovf, g_max, s_ovf, s_max;
-    initial begin g_ovf = 0; g_max = 0; s_ovf = 0; s_max = 0; end
+
+    // 上电初值：两个 16 深弹性 FIFO 的存储体清 0，
+    // 否则仿真开头读到未写过的单元会是 X（波形红色）。
+    integer init_i;
+    initial begin
+        g_ovf = 0; g_max = 0; s_ovf = 0; s_max = 0;
+        for (init_i = 0; init_i < FD; init_i = init_i + 1) begin
+            g_mem[init_i] = 8'd0;
+            s_mem[init_i] = 8'd0;
+        end
+    end
 
     always @(posedge clk) begin
         if (rst_n) begin

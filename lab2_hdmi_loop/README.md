@@ -231,7 +231,16 @@ set_property -dict {PACKAGE_PIN T3 IOSTANDARD LVCMOS33} [get_ports {key[3]}]
 
 ## 7. 仿真与 testbench
 
-仿真脚本：`sim_check/run_compile.bat`（编译）、`run_sim.bat`；独立目录跑可避免 `work` 库污染。
+仿真脚本：`sim_check/prep_sim_dir.bat <目录>`（一键准备 RTL + `.dat` + tb）、`run_compile.bat`、`run_sim.bat`。
+**必须用独立目录/独立库名**跑，否则默认 `work` 库会被旧快照污染（`xvlog` 卡死或 `xelab` 命中旧 tb）。
+
+> **仿真里前几行是红色（X）的两个原因**（都已修）：
+> 1. **HLS 行缓存 BRAM 的 `.dat` 不在仿真目录** → `xsim` 报
+>    `WARNING: File ./gauss3x3_wlb_lb_vbkb_ram.dat ... cannot be opened`，核输出前两行是 X。
+>    用 `prep_sim_dir.bat` 准备目录即可（它会拷 `*.dat`）。
+> 2. 我们自己 RTL 的 FIFO/SRL 没有上电初值 → 已在 `video_sync.v` / `video_core.v` 里加
+>    `` `ifndef SYNTHESIS `` 的 `initial` 清零块（**综合被排除，不影响 BRAM/SRL 推断**）。
+>    `tb_xcheck.v` 用来回归这一点。
 
 | testbench | 验证内容 | 结果 |
 |---|---|---|
@@ -241,6 +250,7 @@ set_property -dict {PACKAGE_PIN T3 IOSTANDARD LVCMOS33} [get_ports {key[3]}]
 | `tb_offset.v` | 高斯流相对输入 DE 的相位（LAT 扫描）+ 在途像素 | LAT=2215/2218 偏移 0 |
 | `tb_sharp_full.v` | **整帧 1080 行**：gray/gauss/sharp 各 2,073,600 拍、FIFO 0 溢出 0 欠载 | PASS |
 | `tb_unsharp_num.v` | 锐化核数值（台阶过冲 / 平坦区恒等） | 公式逐点吻合 |
+| `tb_xcheck.v` | **上电初期是否出现 X**（gauss/sharp/rgb_out/de-hs-vs） | PASS：4 类信号 X 计数全 0 |
 | `tb_core_chain.v` | 双核级联通路（灰度→高斯） | PASS |
 | `tb_sharp.v` | 早期 RTL 配对版逐点比对（已由 HLS 方案取代，留作历史记录） | err=0 |
 | `tb_gauss_demo.v` / `tb_shift_demo.v` / `tb_probe.v` | 演示与 ILA 探针 | — |
