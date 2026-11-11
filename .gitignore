@@ -78,3 +78,7 @@ impl/
 *.Xil/
 /lab2_hdmi_loop/sim_check/keyrun/
 # lab3_ 的生成物排除规则见 lab3_/.gitignore
+
+# 临时转码文件（GBK<->UTF-8 读写用）
+*.u8
+/lab2_hdmi_loop/sim_check/xrun/
