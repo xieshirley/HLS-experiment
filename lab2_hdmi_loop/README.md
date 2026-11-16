@@ -20,7 +20,7 @@ HDMI IN ──> hdmi_rx ──video_rgb/de/hs/vs──> video_core ──> video
 | MODE | 功能 | 送编码器的像素 | 同步方式 | 总延迟 |
 |:--:|---|---|---|:--:|
 | **0** | 直入直出 | `video_rgb` 纯直连（**零寄存器**，等价厂家原始环回） | 直接用 `hdmi_rx` 的 hs/vs/de | 0 |
-| **1** | 灰度 | `rgb2gray` | DE 跟核 `TVALID`（`USE_FIFO_OUT=0`） | 3 拍 |
+| **1** | 灰度 | `rgb2gray` | 定长 DE 延迟 + 像素 FIFO（`USE_FIFO_OUT=1`） | 3 拍 |
 | **2** | 高斯平滑 | `gauss3x3` | 定长 DE 延迟 + 像素 FIFO（`USE_FIFO_OUT=1`） | 2211 拍 |
 | **3** | 拉普拉斯锐化 | `unsharp3x3` | 同上 | 2213 拍 |
 
@@ -128,7 +128,7 @@ localparam integer SYNC_LATENCY = (MODE == 2) ? SYNC_BASE + SYNC_MARGIN :       
 |---|---|
 | 新增端口 | `input [3:0] key`（按下为低） |
 | 新增模块 | `sources_1/new/key_mode.v`：消抖 + 边沿检测 + 模式计数 |
-| 三路同步并行 | `u_sync_gray`(LAT=3) / `u_sync_gauss`(LAT=2211) / `u_sync_sharp`(LAT=2213) |
+| 三路同步并行 | `u_sync_gray`(LAT=3) / `u_sync_gauss`(LAT=2211) / `u_sync_sharp`(LAT=2213)，三档统一为「定长 DE 延迟 + 像素 FIFO」 |
 | 4 选 1 mux | 按 `mode_pix` 选 直通 / 灰度 / 平滑 / 锐化，统一打 1 拍后送 `dvi_transmitter_top` |
 | LED | `led[1:0]`=模式号，`led[2]`=当前档欠载，`led[3]`=当前档溢出 |
 
@@ -145,6 +145,21 @@ key_mode #(.CLK_FREQ(50_000_000), .DEB_MS(15), .KEY_ACTIVE_LOW(1)) u_key_mode(..
   这样跨到 `pixel_clk`（148.5 MHz）域时用普通 **2 级同步器**就安全，不会出现非法中间码。
 * 消抖跑在 **`sys_clk`（50 MHz，板上独立晶振）** 上，与 HDMI 有无输入无关；
   `led[1:0]` 也取自 sys 域，所以**没有 HDMI 输入时按键仍能看到模式变化**。
+
+### 4.5.2b 坑：灰度档不能「DE 直接跟核 TVALID」
+
+最初灰度档用 `USE_FIFO_OUT=0`（`de_out = rgb2gray` 的 `TVALID`），是四档里唯一这样做的。
+上板现象：**切到灰度档显示彩条**（接收端判信号非法，采集卡/显示器输出自己的测试图），
+而平滑/锐化档正常。
+
+原因：DE 由 HLS 核的 `TVALID` 决定，核输出只要拍数不规整（行宽不是干净的 1920），
+接收端就无法锁定；平滑/锐化档的 DE 是**输入 DE 的定长延迟**，行宽必然规整。
+
+修法：灰度档也改成 `USE_FIFO_OUT=1`（`LATENCY=3`）。改完后 DE 是输入 DE 的精确延迟副本
+（仿真实测：DE 宽度 1920、相对 HS 相位 277 与输入一致、R=G=B），与直通档同构、必然合法。
+
+> 教训：**送编码器的 DE 一定由输入时序延迟得到，不要直接引用处理核的 TVALID**。
+> 核的 TVALID 只适合当「数据有效」，不适合当「显示窗口」。
 
 ### 4.5.3 XDC 引脚（抄自达芬奇官方 `DaVinci_FPGA_IO.xdc`）
 

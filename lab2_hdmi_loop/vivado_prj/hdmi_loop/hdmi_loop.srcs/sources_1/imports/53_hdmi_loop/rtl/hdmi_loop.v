@@ -204,9 +204,13 @@ video_core u_video_core(
 //   平滑档：LATENCY=2211、定长 DE + 像素 FIFO
 //   锐化档：LATENCY=2213（= 2211 + 2）、定长 DE + 像素 FIFO
 //-------------------------------------------------------------
+// 灰度档也走"定长 DE + 像素 FIFO"，与平滑/锐化完全同构：
+//   原来 USE_FIFO_OUT=0（DE 直接跟 rgb2gray 的 TVALID），核输出若有拍数抖动，
+//   输出行宽就不是规整的 1920，接收端会判信号非法（采集卡显示彩条）。
+//   改成 FIFO 模式后 DE/HS/VS 全部来自输入时序的定长延迟，与直通档同构、必然合法。
 video_sync #(
     .LATENCY      (3),
-    .USE_FIFO_OUT (0)
+    .USE_FIFO_OUT (1)
 ) u_sync_gray(
     .clk        (pixel_clk),
     .rst_n      (~rx_rst),
@@ -362,9 +366,12 @@ dbg_ila u_dbg_ila (
 //            两灯只在模式 2/3（FIFO 档）有意义，模式 0/1 恒灭
 assign led[1:0] = mode_bin_sys;
 
-wire und_sel = (mode_pix == 2'd2) ? und_gauss :
+// 模式 1/2/3 都走像素 FIFO，诊断灯都有效（模式 0 直通恒灭）
+wire und_sel = (mode_pix == 2'd1) ? und_gray :
+               (mode_pix == 2'd2) ? und_gauss :
                (mode_pix == 2'd3) ? und_sharp : 1'b0;
-wire ovf_sel = (mode_pix == 2'd2) ? ovf_gauss :
+wire ovf_sel = (mode_pix == 2'd1) ? ovf_gray :
+               (mode_pix == 2'd2) ? ovf_gauss :
                (mode_pix == 2'd3) ? ovf_sharp : 1'b0;
 
 reg und_seen, ovf_seen;
